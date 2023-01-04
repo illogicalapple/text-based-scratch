@@ -1,0 +1,15 @@
+signal example_broadcast # broadcast
+
+# backdrops
+asset backdrop1("path/to/file.png")
+
+# sounds
+asset pop("path/to/sound.mp3")
+
+# bs3 is static typed to make things easier
+# for local variables: "local float", "local str"; local variable in the stage will give you an error
+vec2 test_position = (0, 0) # you can store coordinates: easy enough to do since this is static typed
+float test_number = 0 # no ints for obvious reasons (hint hint scratch limitations)
+
+on flag:
+  play_sound(pop, true) # (sound: asset, until_done: bool)

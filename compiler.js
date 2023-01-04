@@ -81,11 +81,15 @@ function comment(blockID, text) {
   }
 }
 
-function compile(code) {
+async function compile(code) {
   var zipReader = new zip.ZipReader(new zip.Data64URIReader(code));
-  var files = zipReader.getEntries()
+  var files = await zipReader.getEntries()
+  var projectInfo = JSON.parse(files.find(e => e.filename == "project.json"))
+  if(!projectInfo) {
+    throw new Error("missing project.json file!")
+  }
   project.targets.push(sprite("Stage"))
-  project.targets[0].isStage = true
+  project.targets[0].isStage = true // make the stage the stage
 }
 
 export default compile
