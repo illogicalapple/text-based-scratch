@@ -15,7 +15,7 @@ var assets = {} // [file name]: [data uri]
 
 class Scratch {
   static ID() {
-    return Date.now()
+    return "BS3-ID-" + Date.now()
   }
 
   static md5ext() {
@@ -82,6 +82,32 @@ class Scratch {
       "height": 200,
       "minimized": false,
       "text": text
+    }
+  }
+
+  static menu(opcode, parent, data) {
+    return {
+      "opcode": opcode,
+      "next": null,
+      "parent": parent,
+      "inputs": {},
+      "fields": data,
+      "shadow": true,
+      "topLevel": !Boolean(parent)
+    }
+  }
+
+  static block(opcode, next, parent, inputs, fields) {
+    return {
+      "opcode": opcode,
+      "next": next,
+      "parent": parent,
+      "inputs": inputs ? inputs : {},
+      "fields": fields ? fields : {},
+      "shadow": true,
+      "topLevel": true,
+      "x": 0,
+      "y": 0
     }
   }
 }
