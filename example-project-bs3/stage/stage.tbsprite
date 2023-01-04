@@ -1,3 +1,5 @@
+@stage
+
 signal example_broadcast # broadcast
 
 # backdrops
