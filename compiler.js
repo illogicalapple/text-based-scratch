@@ -1,3 +1,5 @@
+import * as zip from "https://deno.land/x/zipjs/index.js";
+
 var id = 0
 var project = {
   "targets": [], // sprites
@@ -36,8 +38,8 @@ function asset(name, type, data) {
         "name": name,
         "assetId": assetID,
         "dataFormat": type,
-        "rate": 48000, // MAY CAUSE BUGS
-        "sampleCount": 3073253, // MAY CAUSE BUGS
+        "rate": 48000, // MAY CAUSE BUGS; IDK
+        "sampleCount": 3073253, // MAY CAUSE BUGS; IDK
         "md5ext": `${assetID}.${type}`
       }
     default:
@@ -78,3 +80,12 @@ function comment(blockID, text) {
     "text": text
   }
 }
+
+function compile(code) {
+  var zipReader = new zip.ZipReader(new zip.Data64URIReader(code));
+  var files = zipReader.getEntries()
+  project.targets.push(sprite("Stage"))
+  project.targets[0].isStage = true
+}
+
+export default compile

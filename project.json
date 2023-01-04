@@ -19,16 +19,7 @@
           "rotationCenterY": 180
         }
       ],
-      "sounds": [
-        {
-          "name": "moosic",
-          "assetId": "3ad93daa3fb2d19d32537a3d9d63b631",
-          "dataFormat": "mp3",
-          "rate": 48000,
-          "sampleCount": 3073253,
-          "md5ext": "3ad93daa3fb2d19d32537a3d9d63b631.mp3"
-        }
-      ],
+      "sounds": [],
       "volume": 100,
       "layerOrder": 0,
       "tempo": 60,
