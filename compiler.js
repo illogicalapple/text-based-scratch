@@ -1,21 +1,8 @@
-import * as zip from "https://deno.land/x/zipjs/index.js";
+import zip from "https://deno.land/x/zipjs/index.js"
 
-var id = 0
-var project = {
-  "targets": [], // sprites
-  "monitors": [],
-  "extensions": [],
-  "meta": {
-    "semver": "3.0.0",
-    "vm": "1.23421341234.123490158",
-    "agent": "screw you"
-  }
-}
-var assets = {} // [file name]: [data uri]
-
-class Scratch {
+class BS3 {
   static ID() {
-    return "BS3-ID-" + Date.now()
+    "BS3-ID-" + String(Math.random()).replace(".", "")
   }
 
   static md5ext() {
@@ -110,28 +97,81 @@ class Scratch {
       "y": 0
     }
   }
+
+  static async compile(code) {
+    var project = {
+      "targets": [], // sprites
+      "monitors": [],
+      "extensions": [],
+      "meta": {
+        "semver": "3.0.0",
+        "vm": "1.23421341234.123490158",
+        "agent": "screw you"
+      }
+    }
+    var assets = {} // [file name]: [data uri]
+    var zipReader = new zip.ZipReader(new zip.Data64URIReader(code))
+    var files = await zipReader.getEntries()
+    var projectInfo = JSON.parse(files.find(e => e.filename == "project.json"))
+    var sprites = {}
+    if(!projectInfo) {
+      throw new Error("missing project.json file!")
+    }
+    projectInfo.sprites.forEach(async element => {
+      let spriteToAdd = projectInfo.find(e => e.filename == element)
+      let name = element.split("/")
+      name = name[name.length - 1].split(".")[0]
+      sprites[name] = await spriteToAdd.getData(new zip.TextWriter())
+    })
+    for(let sprite in sprites) {
+      let data = sprites[sprite].split("\n")
+      let topLevel = data.filter(e => !e[0] == "\t")
+      let isStage = topLevel.includes("@stage")
+      let spriteJSON = this.sprite(sprite)
+      spriteJSON.isStage = isStage
+      topLevel.forEach(line => {
+        let words = line.split(" ")
+        let keyword = words[0]
+        switch(keyword) {
+          case "@stage":
+            "this does absolutely nothing"
+          case "str":
+          case "float":
+          case "bool":
+            if(/^[a-zA-Z0-9_]*$/.test(words[1]) && !/[0-9]/.test(words[1][0])) {
+              if(words[2] == "=") {
+                let typeIsValid = false
+                if(keyword == "str") typeIsValid = typeof(JSON.parse(words[3])) == "string"
+                if(keyword == "float") typeIsValid = !isNaN(Number(words[3]))
+                if(keyword == "bool") typeIsValid = ["true", "false"].includes(words[3])
+                if(typeIsValid) {
+                  let variableID = keyword + "_" + this.ID()
+                  spriteJSON.variables[variableID] = [words[1], words[3]]
+                  project.monitors.push({
+                    "id": variableID,
+                    "mode": "default",
+                    "opcode": "data_variable",
+                    "params": {
+                      "VARIABLE": words[1]
+                    },
+                    "spriteName": sprite,
+                    "value": words[3],
+                    "width": 0,
+                    "height": 0,
+                    "x": 0,
+                    "y": 0,
+                    "visible": false,
+                    "sliderMin": 0,
+                    "sliderMax": 100,
+                    "isDiscrete": true
+                  })
+                }
+              }
+            }
+        }
+      })
+    }
+  }
 }
 
-async function compile(code) {
-  var zipReader = new zip.ZipReader(new zip.Data64URIReader(code))
-  var files = await zipReader.getEntries()
-  var projectInfo = JSON.parse(files.find(e => e.filename == "project.json"))
-  var sprites = {}
-  if(!projectInfo) {
-    throw new Error("missing project.json file!")
-  }
-  project.targets.push(Scratch.sprite("Stage"))
-  project.targets[0].isStage = true // make the stage the stage
-  projectInfo.sprites.forEach(async element => {
-    let spriteToAdd = projectInfo.find(e => e.filename == element)
-    let name = element.split("/")
-    name = name[name.length - 1].split(".")[0]
-    sprites[name] = await spriteToAdd.getData(new zip.TextWriter())
-  })
-  for(let sprite in sprites) {
-    let data = sprites[sprite].split("\n")
-    let isStage = data[0] == "@stage"
-  }
-}
-
-export default compile
+export default BS3

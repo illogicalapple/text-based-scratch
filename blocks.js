@@ -259,6 +259,57 @@ export default {
   set_volume: {
     args: {
       new_volume: a(float, "VOLUME", structures.float)
-    }
+    },
+    opcode: "sound_setvolumeto"
+  },
+  broadcast: {
+    args: {
+      signal: a(str, "BROADCAST_INPUT", structures.str)
+    },
+    opcode: "event_broadcast"
+  },
+  broadcast_and_wait: {
+    args: {
+      signal: a(str, "BROADCAST_INPUT", structures.str)
+    },
+    opcode: "event_broadcastandwait"
+  },
+  sleep: {
+    args: {
+      duration: a(float, "DURATION", structures.float)
+    },
+    opcode: "control_wait"
+  },
+  stop: {
+    args: {
+      scope: a(str, "STOP_OPTION", structures.field, true)
+    },
+    opcode: "control_stop"
+  },
+  clone: {
+    args: {
+      sprite: a(str, "CLONE_OPTION", structures.string)
+    },
+    opcode: "control_create_clone_of"
+  },
+  delete_this_clone: {
+    args: {},
+    opcode: "control_delete_this_clone"
+  },
+  prompt: {
+    args: {
+      prompt: a(str, "QUESTION", structures.string)
+    },
+    opcode: "sensing_askandwait"
+  },
+  set_draggable: {
+    args: {
+      drag_mode: a(str, "DRAG_MODE", structures.field, true)
+    },
+    opcode: "sensing_setdragmode"
+  },
+  reset_timer: {
+    args: {},
+    opcode: "sensing_resettimer"
   }
 }
